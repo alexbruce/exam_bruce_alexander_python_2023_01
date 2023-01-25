@@ -1,0 +1,34 @@
+## Pseudocode for Nuvento's Data Academy Stage 1 Programming Exam (Python)
+#  Have classes for
+#   1. Each Bank Account Type
+#   2. Users
+#   3. ATM
+
+CALL importdata()
+
+WHILE(true)
+    user_account_number = INPUT("account number")
+
+
+
+
+CLASS ATM
+
+
+CLASS user
+    REQUIRE user.id
+
+
+CLASS cheque_account
+    can_withdraw = FALSE
+
+
+CLASS savings_account
+    can_withdraw = TRUE
+
+DEFINE main()
+
+
+DEFINE importData()
+
+DEFINE reset_user_data()
