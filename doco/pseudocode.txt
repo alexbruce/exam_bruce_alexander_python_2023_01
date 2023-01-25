@@ -3,32 +3,136 @@
 #   1. Each Bank Account Type
 #   2. Users
 #   3. ATM
+IMPORT PANDAS
 
-CALL importdata()
+userData = []
+openingAccountsData = []
+
+SET account = ""
+SET user = ""
+
+CALL importData()
 
 WHILE(true)
-    user_account_number = INPUT("account number")
+    CALL ATMsession.resetTransaction()
+    SET userID = INPUT("Enter user ID: ")
+    CALL user = getUserInformation(userID)
+    WRITE "Welcome, {firstname} {surname}.\n Please select an option:
+            1 for Deposit
+            2 for Withdraw
+            3 for Balance
+            q to Quit"
+    SET transactionOption = INPUT()
+    IF (transactionOption == "q") THEN
+        CALL quitSequence()
+        BREAK
+    ELSE IF transactionOption != "1" OR "2" OR "3" THEN
+        SET transactionOption = wrongTransactionOption(transactionOption)
+
+    CALL accounts = getAccountInformation(userID)
+    WRITE "Which account would you like to access?"
+    FOR index IN COUNT_ELEMENTS(accounts)
+        WRITE "{index+1} for {accounts[index].accNum} ({accounts[index].type})"
+    SET accountOption = INPUT()
+    IF (accountOption NOT IN COUNT_ELEMENTS(accounts)) THEN
+        SET accountOption = wrongAccountOption(accountOption)
+
+    SET account = accounts[accountOption-1]
+    IF transactionOption == 1 THEN
+        WRITE "Please enter the amount to be deposited:"
+        SET depositAmount = INPUT
+        CALL processDeposit(depositAmount,account)
+    ELSE IF transactionOption == 2 THEN
+        WRITE "Account balance for {account.type} account: {account.bal}"
+        WRITE "Please enter the amount you wish to withdraw."
+        set withdrawalAmount = INPUT
+        IF (withdrawalAmount > account.bal OR withdrawalAmount <= 0) THEN
+            WRITE "ERROR: Amount requested is outside of current amounts 0 - {account.bal} in {account.type} account."
+            CONTINUE
+        CALL processWithdrawal(withdrawalAmount,account)
+    ELSE IF transactionOption == 3 THEN
+        WRITE "Account balance for {account.type} account: {account.bal}"
+    CALL accountSummary()
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 
 CLASS ATM
+    transacAccountHistory = []
+    transacBalanceHistory = []
+
+    DEFINE resetTransaction()
 
 
 CLASS user
     REQUIRE user.id
 
+CLASS chequeAccount
+    INITIALISE(ownerID,accNum,type,bal,canWithdraw)
+        self.ownerID = ownerID
+        self.accNum = accNum
+        self.type = type
+        self.bal = bal
+        self.canWithdraw = FALSE
 
-CLASS cheque_account
-    can_withdraw = FALSE
+CLASS savingsAccount
+    INITIALISE(ownerID,accNum,type,bal,canWithdraw)
+        self.ownerID = ownerID
+        self.accNum = accNum
+        self.type = type
+        self.bal = bal
+        self.canWithdraw = TRUE
 
 
-CLASS savings_account
-    can_withdraw = TRUE
+DEFINE resetVariables()
+
+DEFINE getUserInformation(userID)
+
+DEFINE getAccountNumbers(userID)
+
+DEFINE wrongTransactionOption(transactionOption)
+    WHILE(transactionOption != "q" OR "1" OR "2" OR "3")
+        transactionOption = INPUT("That was not a valid option. Please select an option from the following:
+            1 for Deposit
+            2 for Withdraw
+            3 for Balance
+            q to Quit")
+    RETURN transactionOption
+
+DEFINE wrongAccountOption(accountOption: string, accounts)
+    WHILE(accountOption NOT IN COUNT_ELEMENTS(accounts))
+            WRITE "That was not a valid option. Please select which account you would like to access?"
+            FOR index IN COUNT_ELEMENTS(accounts)
+                WRITE "{index+1} for {accounts[index].accNum} ({accounts[index].type})"
+            SET accountOption = INPUT
+    RETURN accountOption
+
+DEFINE getAccountInformation()
+
+DEFINE processDeposit()
+
 
 DEFINE main()
 
+DEFINE quitSequence(accountData)
+    WRITE accountData
+    WRITE TO PANDAS to
 
 DEFINE importData()
+    accountDataRead = READLINES OpeningAccountsData.txt SPLIT BY "|||"
+    accountDataRead = accountDataRead[1:]
+    accountDataSplit = accountDataRead.split('|||')
+
 
 DEFINE reset_user_data()
