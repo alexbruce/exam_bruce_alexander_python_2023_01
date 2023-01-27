@@ -24,7 +24,7 @@ class ChequeAccount:
         self.accountDBIndex = accountDBIndex
 
 class ATM:
-    def __init__(self, users=[], accounts=[], currentUser=None, currentAccount=None, error=False, exitProgram=False):
+    def __init__(self, users=None, accounts=None, currentUser=None, currentAccount=None, error=False, exitProgram=False):
         self.users = users
         self.accounts = accounts
         self.currentUser = currentUser
@@ -51,7 +51,7 @@ class ATM:
             else:
                 self.handleError("You did not enter a valid user ID")
 
-    def selectAccount(self, transactionOption):
+    def selectTransaction(self, transactionOption):
         if transactionOption == "q":
             self.quitSequence()
         elif transactionOption not in ['1', '2', '3']:
@@ -62,6 +62,7 @@ class ATM:
             index = 0
             optionList = []
             listedAccounts = []
+            print(self.accounts)
             for account in self.accounts:
                 print(account.AccountOwnerID)
                 if account.AccountOwnerID == self.currentUser.AccountOwnerID:
@@ -76,7 +77,7 @@ class ATM:
                 elif int(accountOption) not in optionList:
                     self.handleError("You must choose an option from the given list.")
                 else:
-                    self.currentAccount = listedAccounts[int(accountOption)-1]
+                    self.currentAccount = listedAccounts[int(accountOption) - 1]
                     self.handleTransaction(transactionOption)
 
     def handleTransaction(self,transactionOption):
@@ -114,6 +115,8 @@ class ATM:
 
     def handleError(self, message):
         self.error = True
+        self.currentUser = None
+        self.currentAccount = None
         print("Wrong Input\n{}".format(message))
 
     def quitSequence(self):
@@ -126,7 +129,7 @@ class ATM:
             accountsDataToExport[row][3] = self.accounts[row].OpeningBalance
         print(accountsDataToExport)
 
-        np.savetxt('data/OpeningAccountsData.txt', accountsDataToExport, delimiter="|||", fmt = "%s")
+        np.savetxt('../../data/OpeningAccountsData.txt', accountsDataToExport, delimiter="|||", fmt = "%s")
         self.exitProgram = True
 
     def importData(self):
@@ -159,7 +162,7 @@ class ATM:
             if self.error == True:
                 continue
             transactionOption = input(": ")
-            listedAccounts = self.selectAccount(transactionOption)
+            listedAccounts = self.selectTransaction(transactionOption)
             if self.exitProgram:
                 break
 
@@ -196,8 +199,9 @@ class ATM:
         #self.users = usersList
     # a = data.query("AccountOwnerID == 3")
     # print(data["AccountType"].values)
+if __name__ == '__main__':
+    atm = ATM()
+    atm.importData()
 
-atm = ATM()
-atm.importData()
+    atm.startAtm()
 
-atm.startAtm()
