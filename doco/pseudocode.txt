@@ -1,138 +1,161 @@
-## Pseudocode for Nuvento's Data Academy Stage 1 Programming Exam (Python)
-#  Have classes for
-#   1. Each Bank Account Type
-#   2. Users
-#   3. ATM
-IMPORT PANDAS
+IMPORT numpy AS np
 
-userData = []
-openingAccountsData = []
+CLASS User
+    DEFINE FUNCTION __init__(self, AccountOwnerID,firstname,surname,mobile)
+        SET self.AccountOwnerID TO AccountOwnerID
+        SET self.firstname TO firstname
+        SET self.surname TO surname
+        SET self.mobile TO mobile
 
-SET account = ""
-SET user = ""
+CLASS SavingAccount
+    DEFINE FUNCTION __init__(self, AccountOwnerID,AccountNumber,AccountType,OpeningBalance,accountDBIndex)
+        SET self.AccountOwnerID TO AccountOwnerID
+        SET self.AccountNumber TO AccountNumber
+        SET self.AccountType TO AccountType
+        SET self.OpeningBalance TO OpeningBalance
+        SET self.accountDBIndex TO accountDBIndex
 
-CALL importData()
-
-WHILE(true)
-    CALL ATMsession.resetTransaction()
-    SET userID = INPUT("Enter user ID: ")
-    CALL user = getUserInformation(userID)
-    WRITE "Welcome, {firstname} {surname}.\n Please select an option:
-            1 for Deposit
-            2 for Withdraw
-            3 for Balance
-            q to Quit"
-    SET transactionOption = INPUT()
-    IF (transactionOption == "q") THEN
-        CALL quitSequence()
-        BREAK
-    ELSE IF transactionOption != "1" OR "2" OR "3" THEN
-        SET transactionOption = wrongTransactionOption(transactionOption)
-
-    CALL accounts = getAccountInformation(userID)
-    WRITE "Which account would you like to access?"
-    FOR index IN COUNT_ELEMENTS(accounts)
-        WRITE "{index+1} for {accounts[index].accNum} ({accounts[index].type})"
-    SET accountOption = INPUT()
-    IF (accountOption NOT IN COUNT_ELEMENTS(accounts)) THEN
-        SET accountOption = wrongAccountOption(accountOption)
-
-    SET account = accounts[accountOption-1]
-    IF transactionOption == 1 THEN
-        WRITE "Please enter the amount to be deposited:"
-        SET depositAmount = INPUT
-        CALL processDeposit(depositAmount,account)
-    ELSE IF transactionOption == 2 THEN
-        WRITE "Account balance for {account.type} account: {account.bal}"
-        WRITE "Please enter the amount you wish to withdraw."
-        set withdrawalAmount = INPUT
-        IF (withdrawalAmount > account.bal OR withdrawalAmount <= 0) THEN
-            WRITE "ERROR: Amount requested is outside of current amounts 0 - {account.bal} in {account.type} account."
-            CONTINUE
-        CALL processWithdrawal(withdrawalAmount,account)
-    ELSE IF transactionOption == 3 THEN
-        WRITE "Account balance for {account.type} account: {account.bal}"
-    CALL accountSummary()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+CLASS ChequeAccount
+    DEFINE FUNCTION __init__(self, AccountOwnerID,AccountNumber,AccountType,OpeningBalance,accountDBIndex)
+        SET self.AccountOwnerID TO AccountOwnerID
+        SET self.AccountNumber TO AccountNumber
+        SET self.AccountType TO AccountType
+        SET self.OpeningBalance TO OpeningBalance
+        SET self.accountDBIndex TO accountDBIndex
 
 CLASS ATM
-    transacAccountHistory = []
-    transacBalanceHistory = []
+    DEFINE FUNCTION __init__(self, users=[], accounts=[], currentUser=None, currentAccount=None, error=FALSE, exitProgram=FALSE)
+        SET self.users TO users
+        SET self.accounts TO accounts
+        SET self.currentUser TO currentUser
+        SET self.currentAccount TO currentAccount
+        SET self.error TO error
+        SET self.exitProgram TO exitProgram
+        OUTPUT("Nothing")
 
-    DEFINE resetTransaction()
+    DEFINE FUNCTION beginTransaction(self)
+        SET self.currentUser TO None
+        SET self.currentAccount TO None
+        SET self.error TO FALSE
 
+    DEFINE FUNCTION login(self, userID)
+        IF not userID.isdigit():
+            CALL self.handleError("Hint: Your user ID is a number")
+        ELSE:
+            FOR user IN self.us ers
+                OUTPUT(user.AccountOwnerID)
+                IF user.AccountOwnerID EQUALS userID:
+                    OUTPUT("Welcome, {} {}.\nPlease select an option:\n\t1 FOR Deposit\n\t2 FOR Withdraw\n\t3 FOR Balance\n\tq to Quit".format(user.firstname,user.surname))
+                    SET self.currentUser TO user
+                    break
+            ELSE:
+                CALL self.handleError("You did not enter a valid user ID")
 
-CLASS user
-    REQUIRE user.id
+    DEFINE FUNCTION selectAccount(self, transactionOption)
+        IF transactionOption EQUALS "q"
+            CALL self.quitSequence()
+        ELSEIF transactionOption not IN ['1', '2', '3']
+            CALL self.handleError("You must enter an option from the given list.")
+        ELSE:
+            OUTPUT("Which account would you like to access.")
+            SET transactionOption TO int(transactionOption)
+            SET index TO 0
+            SET optionList TO []
+            SET listedAccounts TO []
+            FOR account IN self.accounts:
+                OUTPUT(account.AccountOwnerID)
+                IF account.AccountOwnerID EQUALS self.currentUser.AccountOwnerID
+                    index += 1
+                    OUTPUT("\t{} FOR {} ({})".format(index, account.AccountNumber, account.AccountType))
+                    optionList.append(index)
+                    listedAccounts.append(account)
+            ELSE:
+                SET accountOption TO INPUT(": ")
+                IF NOT accountOption.isdigit()
+                    CALL self.handleError("You must choose an option from the given list.")
+                ELSEIF int(accountOption) NOT IN optionList
+                    CALL self.handleError("You must choose an option from the given list.")
+                ELSE
+                    SET self.currentAccount TO listedAccounts[int(accountOption)-1]
+                    CALL self.handleTransaction(transactionOption)
 
-CLASS chequeAccount
-    INITIALISE(ownerID,accNum,type,bal,canWithdraw)
-        self.ownerID = ownerID
-        self.accNum = accNum
-        self.type = type
-        self.bal = bal
-        self.canWithdraw = FALSE
+    DEFINE FUNCTION handleTransaction(self,transactionOption)
+        IF transactionOption EQUALS 1
+            CALL self.handleDeposit()
+        ELSEIF transactionOption EQUALS 2
+            CALL self.handleWithdrawal()
+        ELSEIF transactionOption EQUALS 3
+            CALL self.displayBalance()
 
-CLASS savingsAccount
-    INITIALISE(ownerID,accNum,type,bal,canWithdraw)
-        self.ownerID = ownerID
-        self.accNum = accNum
-        self.type = type
-        self.bal = bal
-        self.canWithdraw = TRUE
+    DEFINE FUNCTION handleDeposit(self)
+        OUTPUT("Please enter the amount to be deposited.")
+        SET depositAmount TO INPUT(": $")
+        IF not depositAmount.isdigit()
+            CALL self.handleError("You must enter dollar and cents. (eg: 415.50)")
+        ELSE:
+            CALL self.updateBalance(int(depositAmount))
 
+    DEFINE FUNCTION handleWithdrawal(self)
+        SET OUTPUT("Please enter the amount to be withdrawn. (Balance TO ${})".format(self.currentAccount.OpeningBalance))
+        SET withdrawAmount TO INPUT(": $")
+        IF NOT withdrawAmount.isdigit() or int(withdrawAmount) > self.currentAccount.OpeningBalance or int(withdrawAmount) <= 0
+            self.handleError("Amount to withdraw is outside balance range of $0 - ${} IN your {} account.".format(
+                CALL self.currentAccount.OpeningBalance, self.currentAccount.AccountType))
+        ELSE:
+            CALL self.updateBalance(-int(withdrawAmount))
 
-DEFINE resetVariables()
+    DEFINE FUNCTION displayBalance(self)
+        OUTPUT("Account Summary:\n\tAccount: {} ({})\n\tBalance: {}\n".format(self.currentAccount.AccountNumber, self.currentAccount.AccountType, self.currentAccount.OpeningBalance))
 
-DEFINE getUserInformation(userID)
+    DEFINE FUNCTION updateBalance(self,amount)
+        SET self.currentAccount.OpeningBalance TO self.currentAccount.OpeningBalance + amount
+        SET self.accounts[self.currentAccount.accountDBIndex].OpeningBalance TO self.currentAccount.OpeningBalance
+        CALL self.displayBalance()
 
-DEFINE getAccountNumbers(userID)
+    DEFINE FUNCTION handleError(self, message)
+        SET self.error TO TRUE
+        OUTPUT("Wrong Input\n{}".format(message))
 
-DEFINE wrongTransactionOption(transactionOption)
-    WHILE(transactionOption != "q" OR "1" OR "2" OR "3")
-        transactionOption = INPUT("That was not a valid option. Please select an option from the following:
-            1 for Deposit
-            2 for Withdraw
-            3 for Balance
-            q to Quit")
-    RETURN transactionOption
+    DEFINE FUNCTION quitSequence(self)
+        SET accountsDataToExport TO np.empty([len(self.accounts), 4], dtype=object)
+        FOR row IN range(0, len(self.accounts))
+            SET accountsDataToExport[row][0] TO self.accounts[row].AccountOwnerID
+            SET accountsDataToExport[row][1] TO self.accounts[row].AccountNumber
+            SET accountsDataToExport[row][2] TO self.accounts[row].AccountType
+            SET accountsDataToExport[row][3] TO self.accounts[row].OpeningBalance
+        OUTPUT(accountsDataToExport)
+        SET np.savetxt('data/OpeningAccountsData.txt', accountsDataToExport, delimiter="|||", fmt TO "%s")
+        SET self.exitProgram TO TRUE
 
-DEFINE wrongAccountOption(accountOption: string, accounts)
-    WHILE(accountOption NOT IN COUNT_ELEMENTS(accounts))
-            WRITE "That was not a valid option. Please select which account you would like to access?"
-            FOR index IN COUNT_ELEMENTS(accounts)
-                WRITE "{index+1} for {accounts[index].accNum} ({accounts[index].type})"
-            SET accountOption = INPUT
-    RETURN accountOption
+    DEFINE FUNCTION importData(self)
+        SET importedAccountData TO np.genfromtxt('data/OpeningAccountsData.txt', delimiter='|||', skip_header=1, dtype="str")
+        SET importedUserData TO np.genfromtxt('data/UserInfo.txt', delimiter=',', skip_header=1, dtype="str")
+        OUTPUT(importedUserData)
+        SET accountsList TO []
+        SET usersList TO []
+        FOR index IN range(0,len(importedAccountData))
+            IF importedAccountData[index][2] EQUALS "Saving"
+                SET savingsAccount TO SavingAccount(importedAccountData[index][0], importedAccountData[index][1], importedAccountData[index][2], float(importedAccountData[index][3]), int(index))
+                accountsList.append(savingsAccount)
+            ELSE
+                SET chequeAccount TO ChequeAccount(importedAccountData[index][0], importedAccountData[index][1], importedAccountData[index][2], float(importedAccountData[index][3]), int(index))
+                accountsList.append(chequeAccount)
+        FOR index IN range(0,len(importedUserData))
+            SET user TO User(importedUserData[index][3], importedUserData[index][0], importedUserData[index][1], importedUserData[index][2])
+            usersList.append(user)
+        SET self.accounts TO accountsList
+        SET self.users TO usersList
+        OUTPUT(len(self.accounts))
 
-DEFINE getAccountInformation()
+    DEFINE FUNCTION startAtm(self)
+        WHILE TRUE
+            CALL self.beginTransaction()
+            SET userID TO INPUT("Enter user ID: ")
+            CALL self.login(userID)
+            IF self.error EQUALS TRUE
+                CONTINUE
+            SET transactionOption TO INPUT(": ")
+            CALL SET listedAccounts TO self.selectAccount(transactionOption)
+            IF self.exitProgram:
+                BREAK
 
-DEFINE processDeposit()
-
-
-DEFINE main()
-
-DEFINE quitSequence(accountData)
-    WRITE accountData
-    WRITE TO PANDAS to
-
-DEFINE importData()
-    accountDataRead = READLINES OpeningAccountsData.txt SPLIT BY "|||"
-    accountDataRead = accountDataRead[1:]
-    accountDataSplit = accountDataRead.split('|||')
-
-
-DEFINE reset_user_data()
