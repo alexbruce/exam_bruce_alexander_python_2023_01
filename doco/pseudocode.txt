@@ -131,7 +131,7 @@ DEFINE CLASS ATM:
             SET accountsDataToExport[row+1][3] TO self.accounts[row].OpeningBalance
 
         SAVE 'OpeningAccountsData.txt' FROM accountsDataToExport, seperated by "|||"
-        WRITE all acounts
+        WRITE all accounts
         SET self.exitProgram TO True
 
     DEFINE FUNCTION importData():
