@@ -97,16 +97,16 @@ class ATM:
             self.updateBalance(int(depositAmount))
 
     def handleWithdrawal(self):
-        print("Please enter the amount to be withdrawn. (Balance = ${:=5.2f})".format(self.currentAccount.OpeningBalance))
+        print("Please enter the amount to be withdrawn. (Balance = ${:=.2f})".format(self.currentAccount.OpeningBalance))
         withdrawAmount = input(": $")
         if not withdrawAmount.isdigit() or int(withdrawAmount) > self.currentAccount.OpeningBalance or int(withdrawAmount) <= 0:
-            self.handleError("Amount to withdraw is outside balance range of $0 - ${} in your {} account.".format(
+            self.handleError("Amount to withdraw is outside balance range of $0 - ${:=.2f} in your {} account.".format(
                 self.currentAccount.OpeningBalance, self.currentAccount.AccountType))
         else:
             self.updateBalance(-int(withdrawAmount))
 
     def displayBalance(self):
-        print("Account Summary:\n\tAccount: {} ({})\n\tBalance: {:=5.2f}\n".format(self.currentAccount.AccountNumber, self.currentAccount.AccountType, self.currentAccount.OpeningBalance))
+        print("Account Summary:\n\tAccount: {} ({})\n\tBalance: ${:.2f}\n".format(self.currentAccount.AccountNumber, self.currentAccount.AccountType, self.currentAccount.OpeningBalance))
 
     def updateBalance(self,amount):
         self.currentAccount.OpeningBalance = round(self.currentAccount.OpeningBalance + amount,2)
@@ -127,7 +127,7 @@ class ATM:
             accountsDataToExport[row+1][0] = self.accounts[row].AccountOwnerID
             accountsDataToExport[row+1][1] = self.accounts[row].AccountNumber
             accountsDataToExport[row+1][2] = self.accounts[row].AccountType
-            accountsDataToExport[row+1][3] = self.accounts[row].OpeningBalance
+            accountsDataToExport[row+1][3] = "{:.2f}".format(self.accounts[row].OpeningBalance)
 
         np.savetxt('../data/OpeningAccountsData.txt', accountsDataToExport, delimiter="|||", fmt = "%s")
         accountsDataToExport = pd.DataFrame(accountsDataToExport[1:], columns=accountsDataToExport[0])
