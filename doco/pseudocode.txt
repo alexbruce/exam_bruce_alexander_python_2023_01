@@ -72,9 +72,9 @@ DEFINE CLASS ATM:
             ELSE:
                 SET accountOption TO INPUT()
                 IF NOT accountOption.isdigit():
-                    self.handleError("You must choose an option from the given list.")
+                    handle error
                 ELSEIF int(accountOption) NOT IN optionList:
-                    self.handleError("You must choose an option from the given list.")
+                    handle error
                 ELSE:
                     SET self.currentAccount TO listedAccounts[int(accountOption) - 1]
                     self.handleTransaction(transactionOption)
@@ -91,7 +91,7 @@ DEFINE CLASS ATM:
         WRITE "Please enter the amount to be deposited."
         SET depositAmount TO INPUT()
         IF NOT depositAmount.isdigit():
-            self.handleError("You must enter dollar and cents. (eg: 415.50)")
+            handle error
         ELSE:
             self.updateBalance(int(depositAmount))
 
@@ -99,8 +99,7 @@ DEFINE CLASS ATM:
         WRITE "Please enter the amount to be withdrawn. (Balance ${balance})".format(self.currentAccount.OpeningBalance)
         SET withdrawAmount TO INPUT()
         IF NOT withdrawAmount.isdigit() or int(withdrawAmount) > self.currentAccount.OpeningBalance or int(withdrawAmount) <= 0:
-            self.handleError("Amount to withdraw is outside balance range of $0 - ${} IN your {} account.".format(
-                self.currentAccount.OpeningBalance, self.currentAccount.AccountType))
+            handle error
         ELSE:
             self.updateBalance(-int(withdrawAmount))
 
