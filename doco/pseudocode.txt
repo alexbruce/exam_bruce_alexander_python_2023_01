@@ -1,161 +1,171 @@
-IMPORT numpy AS np
-
-CLASS User
-    DEFINE FUNCTION __init__(self, AccountOwnerID,firstname,surname,mobile)
+DEFINE CLASS User:
+    DEFINE FUNCTION initialise(self, AccountOwnerID,firstname,surname,mobile):
         SET self.AccountOwnerID TO AccountOwnerID
         SET self.firstname TO firstname
         SET self.surname TO surname
         SET self.mobile TO mobile
 
-CLASS SavingAccount
-    DEFINE FUNCTION __init__(self, AccountOwnerID,AccountNumber,AccountType,OpeningBalance,accountDBIndex)
+DEFINE CLASS SavingAccount:
+    DEFINE FUNCTION initialise(self, AccountOwnerID,AccountNumber,AccountType,OpeningBalance,accountDBIndex):
         SET self.AccountOwnerID TO AccountOwnerID
         SET self.AccountNumber TO AccountNumber
         SET self.AccountType TO AccountType
         SET self.OpeningBalance TO OpeningBalance
         SET self.accountDBIndex TO accountDBIndex
 
-CLASS ChequeAccount
-    DEFINE FUNCTION __init__(self, AccountOwnerID,AccountNumber,AccountType,OpeningBalance,accountDBIndex)
+DEFINE CLASS ChequeAccount:
+    DEFINE FUNCTION initialise(self, AccountOwnerID,AccountNumber,AccountType,OpeningBalance,accountDBIndex):
         SET self.AccountOwnerID TO AccountOwnerID
         SET self.AccountNumber TO AccountNumber
         SET self.AccountType TO AccountType
         SET self.OpeningBalance TO OpeningBalance
         SET self.accountDBIndex TO accountDBIndex
 
-CLASS ATM
-    DEFINE FUNCTION __init__(self, users=[], accounts=[], currentUser=None, currentAccount=None, error=FALSE, exitProgram=FALSE)
+DEFINE CLASS ATM:
+    DEFINE FUNCTION initialise(self, users=None, accounts=None, currentUser=None, currentAccount=None, error=False, exitProgram=False):
         SET self.users TO users
         SET self.accounts TO accounts
         SET self.currentUser TO currentUser
         SET self.currentAccount TO currentAccount
         SET self.error TO error
         SET self.exitProgram TO exitProgram
-        OUTPUT("Nothing")
 
-    DEFINE FUNCTION beginTransaction(self)
+    DEFINE FUNCTION beginTransaction():
         SET self.currentUser TO None
         SET self.currentAccount TO None
-        SET self.error TO FALSE
+        SET self.error TO False
 
-    DEFINE FUNCTION login(self, userID)
+    DEFINE FUNCTION login(userID):
         IF not userID.isdigit():
-            CALL self.handleError("Hint: Your user ID is a number")
+            handle error
         ELSE:
-            FOR user IN self.us ers
-                OUTPUT(user.AccountOwnerID)
+            FOR user IN self.users:
                 IF user.AccountOwnerID EQUALS userID:
-                    OUTPUT("Welcome, {} {}.\nPlease select an option:\n\t1 FOR Deposit\n\t2 FOR Withdraw\n\t3 FOR Balance\n\tq to Quit".format(user.firstname,user.surname))
+                    WRITE "Welcome, {firstname} {surname}.
+                    		Please select an option:
+                    			1 FOR Deposit
+                    			2 FOR Withdraw
+                    			3 FOR Balance
+                    			q to Quit"
                     SET self.currentUser TO user
-                    break
+                    leave for loop
             ELSE:
-                CALL self.handleError("You did not enter a valid user ID")
+                handle error
 
-    DEFINE FUNCTION selectAccount(self, transactionOption)
-        IF transactionOption EQUALS "q"
-            CALL self.quitSequence()
-        ELSEIF transactionOption not IN ['1', '2', '3']
-            CALL self.handleError("You must enter an option from the given list.")
-        ELSE:
-            OUTPUT("Which account would you like to access.")
-            SET transactionOption TO int(transactionOption)
-            SET index TO 0
-            SET optionList TO []
-            SET listedAccounts TO []
-            FOR account IN self.accounts:
-                OUTPUT(account.AccountOwnerID)
-                IF account.AccountOwnerID EQUALS self.currentUser.AccountOwnerID
+    DEFINE FUNCTION selectTransaction(transactionOption):
+        IF transactionOption EQUALS "q":
+	    self.quitSequence()
+	ELSEIF transactionOption NOT IN ['1', '2', '3']:
+	    handle error
+	ELSE:
+	    WRITE "Which account would you like to access."
+	    SET transactionOption TO transactionOption
+	    SET index TO 0
+	    SET optionList TO empty list
+	    SET listedAccounts TO empty list
+	    FOR account IN self.accounts:
+		IF account.AccountOwnerID EQUALS self.currentUser.AccountOwnerID:
                     index += 1
-                    OUTPUT("\t{} FOR {} ({})".format(index, account.AccountNumber, account.AccountType))
+                    WRITE "{index} FOR {account number} ({account type})"
                     optionList.append(index)
                     listedAccounts.append(account)
             ELSE:
-                SET accountOption TO INPUT(": ")
-                IF NOT accountOption.isdigit()
-                    CALL self.handleError("You must choose an option from the given list.")
-                ELSEIF int(accountOption) NOT IN optionList
-                    CALL self.handleError("You must choose an option from the given list.")
-                ELSE
-                    SET self.currentAccount TO listedAccounts[int(accountOption)-1]
-                    CALL self.handleTransaction(transactionOption)
+                SET accountOption TO INPUT()
+                IF NOT accountOption.isdigit():
+                    self.handleError("You must choose an option from the given list.")
+                ELSEIF int(accountOption) NOT IN optionList:
+                    self.handleError("You must choose an option from the given list.")
+                ELSE:
+                    SET self.currentAccount TO listedAccounts[int(accountOption) - 1]
+                    self.handleTransaction(transactionOption)
 
-    DEFINE FUNCTION handleTransaction(self,transactionOption)
-        IF transactionOption EQUALS 1
-            CALL self.handleDeposit()
-        ELSEIF transactionOption EQUALS 2
-            CALL self.handleWithdrawal()
-        ELSEIF transactionOption EQUALS 3
-            CALL self.displayBalance()
+    DEFINE FUNCTION handleTransaction(transactionOption):
+        IF transactionOption EQUALS 1:
+            self.handleDeposit()
+        ELSEIF transactionOption EQUALS 2:
+            self.handleWithdrawal()
+        ELSEIF transactionOption EQUALS 3:
+            self.displayBalance()
 
-    DEFINE FUNCTION handleDeposit(self)
-        OUTPUT("Please enter the amount to be deposited.")
-        SET depositAmount TO INPUT(": $")
-        IF not depositAmount.isdigit()
-            CALL self.handleError("You must enter dollar and cents. (eg: 415.50)")
+    DEFINE FUNCTION handleDeposit():
+        WRITE "Please enter the amount to be deposited."
+        SET depositAmount TO INPUT()
+        IF NOT depositAmount.isdigit():
+            self.handleError("You must enter dollar and cents. (eg: 415.50)")
         ELSE:
-            CALL self.updateBalance(int(depositAmount))
+            self.updateBalance(int(depositAmount))
 
-    DEFINE FUNCTION handleWithdrawal(self)
-        SET OUTPUT("Please enter the amount to be withdrawn. (Balance TO ${})".format(self.currentAccount.OpeningBalance))
-        SET withdrawAmount TO INPUT(": $")
-        IF NOT withdrawAmount.isdigit() or int(withdrawAmount) > self.currentAccount.OpeningBalance or int(withdrawAmount) <= 0
+    DEFINE FUNCTION handleWithdrawal():
+        WRITE "Please enter the amount to be withdrawn. (Balance ${balance})".format(self.currentAccount.OpeningBalance)
+        SET withdrawAmount TO INPUT()
+        IF NOT withdrawAmount.isdigit() or int(withdrawAmount) > self.currentAccount.OpeningBalance or int(withdrawAmount) <= 0:
             self.handleError("Amount to withdraw is outside balance range of $0 - ${} IN your {} account.".format(
-                CALL self.currentAccount.OpeningBalance, self.currentAccount.AccountType))
+                self.currentAccount.OpeningBalance, self.currentAccount.AccountType))
         ELSE:
-            CALL self.updateBalance(-int(withdrawAmount))
+            self.updateBalance(-int(withdrawAmount))
 
-    DEFINE FUNCTION displayBalance(self)
-        OUTPUT("Account Summary:\n\tAccount: {} ({})\n\tBalance: {}\n".format(self.currentAccount.AccountNumber, self.currentAccount.AccountType, self.currentAccount.OpeningBalance))
+    DEFINE FUNCTION displayBalance():
+        WRITE "Account Summary:
+        	Account: {account number} ({account type})
+        	Balance: {balance}\n"
 
-    DEFINE FUNCTION updateBalance(self,amount)
-        SET self.currentAccount.OpeningBalance TO self.currentAccount.OpeningBalance + amount
+    DEFINE FUNCTION updateBalance(amount):
+        SET self.currentAccount.OpeningBalance TO round(self.currentAccount.OpeningBalance + amount,2)
         SET self.accounts[self.currentAccount.accountDBIndex].OpeningBalance TO self.currentAccount.OpeningBalance
-        CALL self.displayBalance()
+        self.displayBalance()
 
-    DEFINE FUNCTION handleError(self, message)
-        SET self.error TO TRUE
-        OUTPUT("Wrong Input\n{}".format(message))
+    DEFINE FUNCTION handleError(message):
+        SET self.error TO True
+        SET self.currentUser TO None
+        SET self.currentAccount TO None
+        WRITE "Wrong Input
+        	{message}"
 
-    DEFINE FUNCTION quitSequence(self)
-        SET accountsDataToExport TO np.empty([len(self.accounts), 4], dtype=object)
-        FOR row IN range(0, len(self.accounts))
-            SET accountsDataToExport[row][0] TO self.accounts[row].AccountOwnerID
-            SET accountsDataToExport[row][1] TO self.accounts[row].AccountNumber
-            SET accountsDataToExport[row][2] TO self.accounts[row].AccountType
-            SET accountsDataToExport[row][3] TO self.accounts[row].OpeningBalance
-        OUTPUT(accountsDataToExport)
-        SET np.savetxt('data/OpeningAccountsData.txt', accountsDataToExport, delimiter="|||", fmt TO "%s")
-        SET self.exitProgram TO TRUE
+    DEFINE FUNCTION quitSequence():
+        SET accountsDataToExport TO empty array with length(self.accounts) rows and 4 columns
+        SET accountsDataToExport[0] TO ["AccountOwnerID", "AccountNumber", "AccountType", 'OpeningBalance']
 
-    DEFINE FUNCTION importData(self)
-        SET importedAccountData TO np.genfromtxt('data/OpeningAccountsData.txt', delimiter='|||', skip_header=1, dtype="str")
-        SET importedUserData TO np.genfromtxt('data/UserInfo.txt', delimiter=',', skip_header=1, dtype="str")
-        OUTPUT(importedUserData)
-        SET accountsList TO []
-        SET usersList TO []
-        FOR index IN range(0,len(importedAccountData))
-            IF importedAccountData[index][2] EQUALS "Saving"
+        FOR row IN range(0, len(self.accounts)):
+            SET accountsDataToExport[row+1][0] TO self.accounts[row].AccountOwnerID
+            SET accountsDataToExport[row+1][1] TO self.accounts[row].AccountNumber
+            SET accountsDataToExport[row+1][2] TO self.accounts[row].AccountType
+            SET accountsDataToExport[row+1][3] TO self.accounts[row].OpeningBalance
+
+        SAVE 'OpeningAccountsData.txt' FROM accountsDataToExport, seperated by "|||"
+        WRITE all acounts
+        SET self.exitProgram TO True
+
+    DEFINE FUNCTION importData():
+        SET importedAccountData TO READ "OpeningAccountsData.txt", seperated by "|||"
+        SET importedUserData TO READ "UserInfo.txt" seperated by ","
+        SET accountsList TO empty list
+        SET usersList TO empty list
+        FOR index IN range(0,len(importedAccountData)):
+            IF importedAccountData[index][2] EQUALS "Saving":
                 SET savingsAccount TO SavingAccount(importedAccountData[index][0], importedAccountData[index][1], importedAccountData[index][2], float(importedAccountData[index][3]), int(index))
                 accountsList.append(savingsAccount)
-            ELSE
+            ELSE:
                 SET chequeAccount TO ChequeAccount(importedAccountData[index][0], importedAccountData[index][1], importedAccountData[index][2], float(importedAccountData[index][3]), int(index))
                 accountsList.append(chequeAccount)
-        FOR index IN range(0,len(importedUserData))
+        FOR index IN range(0,len(importedUserData)):
             SET user TO User(importedUserData[index][3], importedUserData[index][0], importedUserData[index][1], importedUserData[index][2])
             usersList.append(user)
         SET self.accounts TO accountsList
         SET self.users TO usersList
-        OUTPUT(len(self.accounts))
 
-    DEFINE FUNCTION startAtm(self)
-        WHILE TRUE
-            CALL self.beginTransaction()
-            SET userID TO INPUT("Enter user ID: ")
-            CALL self.login(userID)
-            IF self.error EQUALS TRUE
-                CONTINUE
-            SET transactionOption TO INPUT(": ")
-            CALL SET listedAccounts TO self.selectAccount(transactionOption)
+    DEFINE FUNCTION startAtm():
+        WHILE True:
+            self.beginTransaction()
+            SET userID TO INPUT()
+            self.login(userID)
+            IF self.error EQUALS True:
+                restart while loop
+            SET transactionOption TO INPUT()
+            SET listedAccounts TO self.selectTransaction(transactionOption)
             IF self.exitProgram:
-                BREAK
+                exit while loop
 
+IF (EXECUTED IN TOP LEVEL CODE):
+    SET atm TO ATM()
+    atm.importData()
+    atm.startAtm()

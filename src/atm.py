@@ -32,7 +32,7 @@ class ATM:
         self.currentAccount = currentAccount
         self.error = error
         self.exitProgram = exitProgram
-        print("Nothing")
+
 
     def beginTransaction(self):
         self.currentUser = None
@@ -44,7 +44,6 @@ class ATM:
             self.handleError("Hint: Your user ID is a number")
         else:
             for user in self.users:
-                print(user.AccountOwnerID)
                 if user.AccountOwnerID == userID:
                     print("Welcome, {} {}.\nPlease select an option:\n\t1 for Deposit\n\t2 for Withdraw\n\t3 for Balance\n\tq to Quit".format(user.firstname,user.surname))
                     self.currentUser = user
@@ -63,9 +62,9 @@ class ATM:
             index = 0
             optionList = []
             listedAccounts = []
-            print(self.accounts)
+
             for account in self.accounts:
-                print(account.AccountOwnerID)
+
                 if account.AccountOwnerID == self.currentUser.AccountOwnerID:
                     index += 1
                     print("\t{} for {} ({})".format(index, account.AccountNumber, account.AccountType))
@@ -129,7 +128,6 @@ class ATM:
             accountsDataToExport[row+1][1] = self.accounts[row].AccountNumber
             accountsDataToExport[row+1][2] = self.accounts[row].AccountType
             accountsDataToExport[row+1][3] = self.accounts[row].OpeningBalance
-        # TODO Print all accounts
 
         np.savetxt('../data/OpeningAccountsData.txt', accountsDataToExport, delimiter="|||", fmt = "%s")
         accountsDataToExport = pd.DataFrame(accountsDataToExport[1:], columns=accountsDataToExport[0])
@@ -139,7 +137,7 @@ class ATM:
     def importData(self):
         importedAccountData = np.genfromtxt('../data/OpeningAccountsData.txt', delimiter='|||', skip_header=1, dtype="str")
         importedUserData = np.genfromtxt('../data/UserInfo.txt', delimiter=',', skip_header=1, dtype="str")
-        print(importedUserData)
+
         accountsList = []
         usersList = []
         for index in range(0,len(importedAccountData)):
@@ -156,7 +154,7 @@ class ATM:
 
         self.accounts = accountsList
         self.users = usersList
-        print(len(self.accounts))
+
 
     def startAtm(self):
         while True:
@@ -170,39 +168,7 @@ class ATM:
             if self.exitProgram:
                 break
 
-        #importedAccountData = pd.read_csv('data/OpeningAccountsData.txt', skiprows=0, sep='\|\|\|', engine='python', dtype={"AccountOwnerID":"str"})
-        #importedUserData = pd.read_csv('data/UserInfo.txt',dtype="str")
-        #accountOwnerID = importedAccountData["AccountOwnerID"].values
-        #accountNumber = importedAccountData["AccountNumber"].values
-        #accountType = importedAccountData["AccountType"].values
-        #accountOpeningBalance = importedAccountData["OpeningBalance"].values
 
-        #userOwnerID = importedUserData["AccountOwnerID"].values
-        #userFirstName = importedUserData["FirstName"].values
-        #userSurname = importedUserData["Surname"].values
-        #userMobile = importedUserData["Mobile"].values
-
-        #accountIndex = importedAccountData.index
-        #userIndex = importedUserData.index
-        #accountsList = []
-        #usersList = []
-        #for index in range(0, len(importedAccountData.index)):
-        ###    if accountType[index] == "Saving":
-        #        savingsAccount = SavingAccount(accountOwnerID[index], accountNumber[index], accountType[index], accountOpeningBalance[index], accountIndex[index])
-        #        accountsList.append(savingsAccount)
-        #    else:
-        #        chequeAccount = SavingAccount(accountOwnerID[index], accountNumber[index], accountType[index], accountOpeningBalance[index], accountIndex[index])
-        #        accountsList.append(chequeAccount)
-        #for index in range(0, len(importedUserData.index)):
-
-         #   user = User(userOwnerID[index], userFirstName[index], userSurname[index], userMobile[index])
-         #   usersList.append(user)
-
-        #self.accounts = accountsList
-        #print(self.accounts[1].AccountType)
-        #self.users = usersList
-    # a = data.query("AccountOwnerID == 3")
-    # print(data["AccountType"].values)
 if __name__ == '__main__':
     atm = ATM()
     atm.importData()
