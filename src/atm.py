@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 class User:
     def __init__(self, AccountOwnerID,firstname,surname,mobile):
@@ -97,7 +98,7 @@ class ATM:
             self.updateBalance(int(depositAmount))
 
     def handleWithdrawal(self):
-        print("Please enter the amount to be withdrawn. (Balance = ${})".format(self.currentAccount.OpeningBalance))
+        print("Please enter the amount to be withdrawn. (Balance = ${:=5.2f})".format(self.currentAccount.OpeningBalance))
         withdrawAmount = input(": $")
         if not withdrawAmount.isdigit() or int(withdrawAmount) > self.currentAccount.OpeningBalance or int(withdrawAmount) <= 0:
             self.handleError("Amount to withdraw is outside balance range of $0 - ${} in your {} account.".format(
@@ -106,10 +107,10 @@ class ATM:
             self.updateBalance(-int(withdrawAmount))
 
     def displayBalance(self):
-        print("Account Summary:\n\tAccount: {} ({})\n\tBalance: {}\n".format(self.currentAccount.AccountNumber, self.currentAccount.AccountType, self.currentAccount.OpeningBalance))
+        print("Account Summary:\n\tAccount: {} ({})\n\tBalance: {:=5.2f}\n".format(self.currentAccount.AccountNumber, self.currentAccount.AccountType, self.currentAccount.OpeningBalance))
 
     def updateBalance(self,amount):
-        self.currentAccount.OpeningBalance = self.currentAccount.OpeningBalance + amount
+        self.currentAccount.OpeningBalance = round(self.currentAccount.OpeningBalance + amount,2)
         self.accounts[self.currentAccount.accountDBIndex].OpeningBalance = self.currentAccount.OpeningBalance
         self.displayBalance()
 
@@ -120,21 +121,24 @@ class ATM:
         print("Wrong Input\n{}".format(message))
 
     def quitSequence(self):
-        accountsDataToExport = np.empty([len(self.accounts), 4], dtype=object)
+        accountsDataToExport = np.empty([len(self.accounts)+1, 4], dtype=object)
+        accountsDataToExport[0] = ["AccountOwnerID", "AccountNumber", "AccountType", 'OpeningBalance']
 
         for row in range(0, len(self.accounts)):
-            accountsDataToExport[row][0] = self.accounts[row].AccountOwnerID
-            accountsDataToExport[row][1] = self.accounts[row].AccountNumber
-            accountsDataToExport[row][2] = self.accounts[row].AccountType
-            accountsDataToExport[row][3] = self.accounts[row].OpeningBalance
-        print(accountsDataToExport)
+            accountsDataToExport[row+1][0] = self.accounts[row].AccountOwnerID
+            accountsDataToExport[row+1][1] = self.accounts[row].AccountNumber
+            accountsDataToExport[row+1][2] = self.accounts[row].AccountType
+            accountsDataToExport[row+1][3] = self.accounts[row].OpeningBalance
+        # TODO Print all accounts
 
-        np.savetxt('../../data/OpeningAccountsData.txt', accountsDataToExport, delimiter="|||", fmt = "%s")
+        np.savetxt('../data/OpeningAccountsData.txt', accountsDataToExport, delimiter="|||", fmt = "%s")
+        accountsDataToExport = pd.DataFrame(accountsDataToExport[1:], columns=accountsDataToExport[0])
+        print(accountsDataToExport.to_string(index=False))
         self.exitProgram = True
 
     def importData(self):
-        importedAccountData = np.genfromtxt('../../data/OpeningAccountsData.txt', delimiter='|||', skip_header=1, dtype="str")
-        importedUserData = np.genfromtxt('../../data/UserInfo.txt', delimiter=',', skip_header=1, dtype="str")
+        importedAccountData = np.genfromtxt('../data/OpeningAccountsData.txt', delimiter='|||', skip_header=1, dtype="str")
+        importedUserData = np.genfromtxt('../data/UserInfo.txt', delimiter=',', skip_header=1, dtype="str")
         print(importedUserData)
         accountsList = []
         usersList = []
