@@ -36,7 +36,7 @@ DEFINE CLASS ATM:
         SET self.error TO False
 
     DEFINE FUNCTION login(userID):
-        IF not userID.isdigit():
+        IF (userID IS NOT A NUMBER):
             handle error
         ELSE:
             FOR user IN self.users:
@@ -71,7 +71,7 @@ DEFINE CLASS ATM:
                     listedAccounts.append(account)
             ELSE:
                 SET accountOption TO INPUT()
-                IF NOT accountOption.isdigit():
+                IF (accountOption IS NOT A NUMBER):
                     handle error
                 ELSEIF int(accountOption) NOT IN optionList:
                     handle error
@@ -90,7 +90,7 @@ DEFINE CLASS ATM:
     DEFINE FUNCTION handleDeposit():
         WRITE "Please enter the amount to be deposited."
         SET depositAmount TO INPUT()
-        IF NOT depositAmount.isdigit():
+        IF (depositAmount IS NOT A NUMBER):
             handle error
         ELSE:
             self.updateBalance(int(depositAmount))
